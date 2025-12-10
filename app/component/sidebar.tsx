@@ -1,29 +1,59 @@
+"use client";
 import { SideBarIcon } from "../icons/sideIcon";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Sidebar,
+  SidebarHeader,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarMenu,
+} from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { StarIcon } from "../icons/starIcon";
 import { NoteIcon } from "../icons/noteIcon";
+import { useState } from "react";
 export const SideBar = () => {
+  const [collap, setCollap] = useState(false);
   return (
-    <div className="flex justify-between w-full h-full">
-      <div className="w-18 h-242 border border-b-gray-200 flex justify-center items-start py-10 ">
-        <SideBarIcon />
-      </div>
-      <div className="w-full bg-gray-100 flex justify-center items-center ">
-        <Card className="w-[856px] h-[442px]">
+    <div className="flex w-full min-h-screen">
+      <Sidebar
+        className={`border-r bg-white relative transition-all duration-300 ${
+          collap
+            ? "w-[72px] bg-transparent border-none "
+            : "w-[300px] bg-white border-r"
+        }`}
+      >
+        <SidebarHeader>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <div className="flex justify-between">
+                {!collap && (
+                  <p className="text-[20px] font-semibold">History</p>
+                )}
+                <button
+                  className="p-2 rounded "
+                  onClick={() => setCollap(!collap)}
+                >
+                  <SideBarIcon />
+                </button>
+              </div>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarHeader>
+      </Sidebar>
+      <div className="flex-1 bg-white flex justify-center items-start py-14 px-6 w-[1980px]">
+        <Card className={`h-[442px] ${collap ? "w-[856px]" : "w-[628px]"}`}>
           <CardHeader>
             <CardTitle className="flex gap-3 items-center">
-              {" "}
               <StarIcon />
               Article Quiz Generator
             </CardTitle>
@@ -34,41 +64,29 @@ export const SideBar = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form>
-              <div className="flex flex-col gap-6">
-                <div className="grid gap-2">
-                  <Label htmlFor="email">
-                    {" "}
-                    <NoteIcon />
-                    Article Title
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Enter a title for your article..."
-                    className="h-10"
-                    required
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="password">
-                    <NoteIcon /> Article Content
-                  </Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Paste your article content here..."
-                    className="h-30"
-                    required
-                  />
-                </div>
+            <form className="flex flex-col gap-6">
+              <div className="grid gap-2">
+                <Label>
+                  <NoteIcon /> Article Title
+                </Label>
+                <Input
+                  placeholder="Enter a title for your article..."
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label>
+                  <NoteIcon /> Article Content
+                </Label>
+                <Input
+                  placeholder="Paste your article content here..."
+                  required
+                />
               </div>
             </form>
           </CardContent>
-          <CardFooter className="flex-col gap-2 items-end">
-            <Button type="submit" className="w-40 h-10">
-              Generate summary
-            </Button>
+          <CardFooter className="flex justify-end">
+            <Button className="w-40 h-10">Generate summary</Button>
           </CardFooter>
         </Card>
       </div>
