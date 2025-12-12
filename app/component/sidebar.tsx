@@ -12,7 +12,6 @@ import {
   Sidebar,
   SidebarHeader,
   SidebarMenuItem,
-  SidebarMenuButton,
   SidebarMenu,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
@@ -80,6 +79,7 @@ export const SideBar = () => {
                 </Label>
                 <Input
                   placeholder="Paste your article content here..."
+                  className="h-30"
                   required
                 />
               </div>

@@ -30,34 +30,34 @@ export const CheckScore = () => {
           </div>
           <div className="flex flex-row gap-3 items-center ">
             <RightIcon />
-            <div>
+            <div className="text-[#71717a]">
               1. What was Chingis Khan`s birth name?
-              <p>Your answer: Toghtul</p>
+              <p className="text-black">Your answer: Toghtul</p>
+              <p className="text-green-500">Correct : Temujin</p>
+            </div>
+          </div>
+          <div className="flex flex-row gap-3 items-center ">
+            <WrongIcon />
+            <div className="text-[#71717a]">
+              1. What was Chingis Khan`s birth name?
+              <p className="text-black">Your answer: Toghtul</p>
               <p className="text-green-500">Correct : Temujin</p>
             </div>
           </div>
           <div className="flex flex-row gap-3 items-center ">
             <RightIcon />
-            <div>
+            <div className="text-[#71717a]">
               1. What was Chingis Khan`s birth name?
-              <p>Your answer: Toghtul</p>
-              <p>Correct : Temujin</p>
+              <p className="text-black">Your answer: Toghtul</p>
+              <p className="text-green-500">Correct : Temujin</p>
             </div>
           </div>
           <div className="flex flex-row gap-3 items-center ">
-            <RightIcon />
-            <div>
+            <WrongIcon />
+            <div className="text-[#71717a]">
               1. What was Chingis Khan`s birth name?
-              <p>Your answer: Toghtul</p>
-              <p>Correct : Temujin</p>
-            </div>
-          </div>
-          <div className="flex flex-row gap-3 items-center ">
-            <RightIcon />
-            <div>
-              1. What was Chingis Khan`s birth name?
-              <p>Your answer: Toghtul</p>
-              <p>Correct : Temujin</p>
+              <p className="text-black">Your answer: Toghtul</p>
+              <p className="text-green-500">Correct : Temujin</p>
             </div>
           </div>
         </div>
