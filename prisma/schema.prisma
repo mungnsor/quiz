@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = env("DATABASE_URL")
 } 
 model Article{
   id String @id @unique @default(cuid())
@@ -26,7 +26,7 @@ model User{
   updatedAt DateTime @default(now())
   articles Article[]
   quizAttempts QuizAttempt[]
-  userScorees UserScores[]
+  userScores UserScores[]
 }
 model Quiz{
     id String @id @unique @default(cuid())
@@ -38,7 +38,7 @@ model Quiz{
    createdAt DateTime @default(now())
    updatedAt DateTime @default(now())
    quizAttempts QuizAttempt[]
-   userScorees UserScores[]
+   userScores UserScores[]
 }
 model QuizAttempt{
    id String @id @unique @default(cuid())
@@ -48,10 +48,10 @@ model QuizAttempt{
    quiz Quiz @relation(fields: [quizId],references: [id])
 }
 model UserScores{
-    id String @id @unique @default(cuid())
-    userId String
-     user User @relation(fields: [userId],references: [id])
-     quizId String
-     quiz Quiz @relation(fields: [quizId],references: [id])
-     totalScore Int
+   id String @id @unique @default(cuid())
+   userId String
+   user User @relation(fields: [userId],references: [id])
+   quizId String
+   quiz Quiz @relation(fields: [quizId],references: [id])
+  totalScore Int
 }
