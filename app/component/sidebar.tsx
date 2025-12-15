@@ -121,7 +121,7 @@ export const SideBar = () => {
           </CardContent>
           <CardFooter className="flex justify-end">
             <Button className="w-40 h-10" onClick={handleGenerate}>
-              Generate summary
+              {loading ? "Loading" : "Generate summary"}
             </Button>
           </CardFooter>
         </Card>
