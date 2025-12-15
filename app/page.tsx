@@ -9,7 +9,7 @@ export default async function Home() {
   console.log(users, "aasda");
 
   return (
-    <div>
+    <div className="w-full">
       <Header />
       <SideBar />
       {/* <QuizTest />
