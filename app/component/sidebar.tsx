@@ -22,6 +22,40 @@ import { NoteIcon } from "../icons/noteIcon";
 import { useState } from "react";
 export const SideBar = () => {
   const [collap, setCollap] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [generate, setGenerate] = useState("");
+  const handleGenerate = async () => {
+    if (!generate) return;
+
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/generated", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ generate }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Request failed");
+      }
+
+      const data = await response.json();
+
+      if (data.error) {
+        console.error(data.error);
+        return;
+      }
+      console.log("Generated result:", data);
+    } catch (err) {
+      console.error("Generate failed:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="flex w-full min-h-screen">
       <Sidebar
@@ -86,7 +120,9 @@ export const SideBar = () => {
             </form>
           </CardContent>
           <CardFooter className="flex justify-end">
-            <Button className="w-40 h-10">Generate summary</Button>
+            <Button className="w-40 h-10" onClick={handleGenerate}>
+              Generate summary
+            </Button>
           </CardFooter>
         </Card>
       </div>

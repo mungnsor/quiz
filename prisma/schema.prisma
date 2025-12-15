@@ -29,10 +29,10 @@ model User{
   userScores UserScores[]
 }
 model Quiz{
-    id String @id @unique @default(cuid())
+   id String @id @unique @default(cuid())
    question String
-    options String[]
-    answer String
+   options String[]
+   answer String
    articleId String
    article Article @relation(fields: [articleId],references: [id])
    createdAt DateTime @default(now())
@@ -53,5 +53,5 @@ model UserScores{
    user User @relation(fields: [userId],references: [id])
    quizId String
    quiz Quiz @relation(fields: [quizId],references: [id])
-  totalScore Int
+   totalScore Int
 }
