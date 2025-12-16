@@ -31,7 +31,6 @@ export const SideBar = () => {
   const [content, setContent] = useState("");
   const [input, setInput] = useState("");
   const [title, setTitle] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
   const handleGenerate = async () => {
     setLoading(true);
     try {
@@ -49,7 +48,6 @@ export const SideBar = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(errorText || "Request failed");
       }
       const data = await response.json();
       if (data.error) {
@@ -63,51 +61,6 @@ export const SideBar = () => {
       setLoading(false);
     }
   };
-  const handleSend = async () => {
-    if (!input.trim() || loading) return;
-
-    const userMessage = input.trim();
-    setInput("");
-
-    const newMessages = [...messages, { role: "user", content: userMessage }];
-    setMessages(newMessages);
-    setLoading(true);
-
-    try {
-      const response = await fetch("/api/gemini", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: newMessages,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: data.text || "No response",
-        },
-      ]);
-    } catch (err) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: `Error: ${err.message}`,
-        },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="flex w-full min-h-screen">
       <SidebarProvider className="w-1">
@@ -175,12 +128,10 @@ export const SideBar = () => {
               </div>
             </form>
           </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button className="w-40 h-10" onClick={handleSend}>
-              Generate first
-            </Button>
+          <CardFooter className="flex justify-end">
+            {/* <Button className="w-40 h-10">Generate first</Button> */}
             <Button className="w-40 h-10" onClick={handleGenerate}>
-              {loading ? "Loading" : "Generate summary second"}
+              {loading ? "Loading" : "Generate summary"}
             </Button>
           </CardFooter>
         </Card>
