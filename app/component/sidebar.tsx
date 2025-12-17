@@ -22,14 +22,13 @@ import { StarIcon } from "../icons/starIcon";
 import { NoteIcon } from "../icons/noteIcon";
 import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
+import { Textarea } from "@/components/ui/textarea";
 export const SideBar = () => {
   const { user } = useUser();
   const userId = user?.id;
   const [collap, setCollap] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [generate, setGenerate] = useState("");
   const [content, setContent] = useState("");
-  const [input, setInput] = useState("");
   const [title, setTitle] = useState("");
   const handleGenerate = async () => {
     setLoading(true);
@@ -46,17 +45,41 @@ export const SideBar = () => {
         }),
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-      }
-      const data = await response.json();
-      if (data.error) {
-        console.error(data.error);
-        return;
-      }
-      console.log("Generated result:", data);
+      // if (!response.ok) {
+      //   const errorText = await response.text();
+      // }
+      // const data = await response.json();
+      // if (data.error) {
+      //   console.error(data.error);
+      //   return;
+      // }
+      // console.log("Generated result:", data);
     } catch (err) {
       console.error("Generate failed:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleHistory = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/article", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText);
+      }
+
+      const data = await response.json();
+      console.log("history", data);
+    } catch (err) {
+      console.error("history", err);
     } finally {
       setLoading(false);
     }
@@ -76,7 +99,13 @@ export const SideBar = () => {
               <SidebarMenuItem>
                 <div className="flex justify-between">
                   {!collap && (
-                    <p className="text-[20px] font-semibold">History</p>
+                    <p
+                      className="text-[20px] font-semibold"
+                      // onClick={handleHistory}
+                    >
+                      {" "}
+                      History
+                    </p>
                   )}
                   <button
                     className="p-2 rounded "
@@ -119,7 +148,7 @@ export const SideBar = () => {
                 <Label>
                   <NoteIcon /> Article Content
                 </Label>
-                <Input
+                <Textarea
                   placeholder="Paste your article content here..."
                   className="h-30"
                   required
@@ -129,7 +158,6 @@ export const SideBar = () => {
             </form>
           </CardContent>
           <CardFooter className="flex justify-end">
-            {/* <Button className="w-40 h-10">Generate first</Button> */}
             <Button className="w-40 h-10" onClick={handleGenerate}>
               {loading ? "Loading" : "Generate summary"}
             </Button>

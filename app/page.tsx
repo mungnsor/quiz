@@ -1,16 +1,27 @@
-import prisma from "@/lib/prisma";
-import { CheckScore } from "./component/checkScore";
+"use client";
+
 import { Header } from "./component/header";
-import { QuizTest } from "./component/quiz";
 import { SideBar } from "./component/sidebar";
-import { log } from "console";
+import { useEffect } from "react";
+import { useUser } from "@clerk/nextjs";
 
-export default async function Home() {
-  const users = await prisma.user.findMany();
-  const article = await prisma.article.findMany();
-  console.log(users, "aa");
-  console.log(article, "art");
-
+export default function Home() {
+  const { user } = useUser();
+  useEffect(() => {
+    if (user) {
+      fetch("/api/user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          clerkId: user.id,
+          email: user.primaryEmailAddress?.emailAddress,
+          name: user.fullName,
+        }),
+      });
+    }
+  }, [user]);
   return (
     <div className="w-full">
       <Header />

@@ -4,11 +4,13 @@ export const POST = async (request: Request) => {
   try {
     const body = await request.json();
 
-    const article = await prisma.user.create({
-      data: body,
+    const existingUser = await prisma.user.findFirst({
+      where: { clerkId: body.clerkId },
     });
+    if (existingUser) return new Response("User exists");
+    const user = await prisma.user.create({ data: body });
 
-    return new Response(JSON.stringify({ article }), {
+    return new Response(JSON.stringify({ user }), {
       status: 201,
       headers: { "Content-Type": "application/json" },
     });
