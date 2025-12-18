@@ -16,25 +16,30 @@
 //   }
 // };
 import prisma from "@/lib/prisma";
-import { NextRequest } from "next/server";
 
-export const GET = async (req: NextRequest) => {
+export const GET = async (req: Request) => {
   try {
     const { searchParams } = new URL(req.url);
-    const title = searchParams.get("title");
-
+    const userId = searchParams.get("userId");
+    if (!userId) {
+      return new Response(JSON.stringify({ message: "User ID is required" }), {
+        status: 400,
+      });
+    }
     const articles = await prisma.article.findMany({
-      where: title
-        ? {
-            title: {
-              contains: title,
-              mode: "insensitive",
-            },
-          }
-        : undefined,
+      where: {
+        userId,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+        title: true,
+        createdAt: true,
+      },
     });
-
-    return new Response(JSON.stringify({ articles }), {
+    return new Response(JSON.stringify(articles), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
@@ -42,7 +47,7 @@ export const GET = async (req: NextRequest) => {
     console.error(error);
     return new Response(
       JSON.stringify({ message: "Failed to fetch articles" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
+      { status: 500 }
     );
   }
 };

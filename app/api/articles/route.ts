@@ -4,7 +4,6 @@ import { NextResponse } from "next/server";
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_KEYS,
 });
-
 export const POST = async (request: Request) => {
   const body = await request.json();
   const { title, content, userId } = body;
@@ -17,8 +16,6 @@ export const POST = async (request: Request) => {
     model: "gemini-2.5-flash",
     contents: `this article is article please summarize to me this: ${body.content}`,
   });
-  console.log(res, "raaaaaararararrararar");
-
   const { candidates } = res as any;
   const summary = candidates[0].content.parts[0].text;
 
@@ -39,7 +36,6 @@ export const POST = async (request: Request) => {
     return NextResponse.json({ error: "aldaa" }, { status: 201 });
   }
 };
-
 export const GET = async (request: Request) => {
   try {
     const articles = await prisma.article.findMany();
