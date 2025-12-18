@@ -1,45 +1,24 @@
-// import prisma from "@/lib/prisma";
-// export const GET = async () => {
-//   try {
-//     const articles = await prisma.article.findMany();
-
-//     return new Response(JSON.stringify({ articles }), {
-//       status: 200,
-//       headers: { "Content-Type": "application/json" },
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     return new Response(
-//       JSON.stringify({ message: "Failed to fetch all articles" }),
-//       { status: 500, headers: { "Content-Type": "application/json" } }
-//     );
-//   }
-// };
 import prisma from "@/lib/prisma";
-
-export const GET = async (req: Request) => {
+export const GET = async (request: Request) => {
   try {
-    const { searchParams } = new URL(req.url);
+    const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
+
     if (!userId) {
-      return new Response(JSON.stringify({ message: "User ID is required" }), {
+      return new Response(JSON.stringify({ message: "userId is required" }), {
         status: 400,
+        headers: { "Content-Type": "application/json" },
       });
     }
+
+    const user = await prisma.user.findFirst({ where: { clerkId: userId } });
+
     const articles = await prisma.article.findMany({
-      where: {
-        userId,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      select: {
-        id: true,
-        title: true,
-        createdAt: true,
-      },
+      where: { userId: user?.id },
+      orderBy: { createdAt: "desc" },
     });
-    return new Response(JSON.stringify(articles), {
+
+    return new Response(JSON.stringify({ articles }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
@@ -47,7 +26,50 @@ export const GET = async (req: Request) => {
     console.error(error);
     return new Response(
       JSON.stringify({ message: "Failed to fetch articles" }),
-      { status: 500 }
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 };
+// import prisma from "@/lib/prisma";
+
+// export const GET = async (request: Request) => {
+//   try {
+//     const { searchParams } = new URL(request.url);
+//     const articleId = searchParams.get("articleId");
+//     const userId = searchParams.get("userId");
+//     if (!articleId) {
+//       return new Response(
+//         JSON.stringify({ message: "articleId is required" }),
+//         { status: 400, headers: { "Content-Type": "application/json" } }
+//       );
+//     }
+//     if (!userId) {
+//       return new Response(JSON.stringify({ message: "userId is required" }), {
+//         status: 400,
+//         headers: { "Content-Type": "application/json" },
+//       });
+//     }
+//     const article = await prisma.article.findUnique({
+//       where: { id: articleId, userId },
+//       include: { quizzes: true },
+//     });
+
+//     if (!article) {
+//       return new Response(JSON.stringify({ message: "Article not found" }), {
+//         status: 404,
+//         headers: { "Content-Type": "application/json" },
+//       });
+//     }
+
+//     return new Response(JSON.stringify({ article }), {
+//       status: 200,
+//       headers: { "Content-Type": "application/json" },
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     return new Response(
+//       JSON.stringify({ message: "Failed to fetch article" }),
+//       { status: 500, headers: { "Content-Type": "application/json" } }
+//     );
+//   }
+// };

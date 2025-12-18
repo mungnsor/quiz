@@ -23,7 +23,7 @@ export default function Home() {
     }
   }, [user]);
   return (
-    <div className="w-full">
+    <div className="w-full ">
       <Header />
       <SideBar />
       {/* <QuizTest />
