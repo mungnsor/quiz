@@ -30,8 +30,6 @@ export const GET = async (request: Request) => {
     );
   }
 };
-// import prisma from "@/lib/prisma";
-
 // export const GET = async (request: Request) => {
 //   try {
 //     const { searchParams } = new URL(request.url);
@@ -53,14 +51,13 @@ export const GET = async (request: Request) => {
 //       where: { id: articleId, userId },
 //       include: { quizzes: true },
 //     });
-
+//     console.log(article, "article");
 //     if (!article) {
 //       return new Response(JSON.stringify({ message: "Article not found" }), {
 //         status: 404,
 //         headers: { "Content-Type": "application/json" },
 //       });
 //     }
-
 //     return new Response(JSON.stringify({ article }), {
 //       status: 200,
 //       headers: { "Content-Type": "application/json" },

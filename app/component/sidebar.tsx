@@ -1,5 +1,4 @@
 "use client";
-import { SideBarIcon } from "../icons/sideIcon";
 import {
   Card,
   CardContent,
@@ -33,6 +32,8 @@ import { useUser } from "@clerk/nextjs";
 import { Textarea } from "@/components/ui/textarea";
 import { LeftIcon } from "../icons/leftIcon";
 import { BookIcon } from "../icons/bookIcon";
+import { SideBarIcon } from "../icons/sideIcon";
+import { log } from "console";
 type Article = {
   id: string;
   title: string;
@@ -44,18 +45,29 @@ type History = {
   userId: string;
   title: string;
 };
+type Quiz = {
+  id: String;
+  question: string;
+  options: string;
+  answer: string;
+};
 export const SideBar = () => {
   const { user } = useUser();
   const userId = user?.id;
-
+  // const { article } = useUser();
+  // const articleId = article?.id;
   const [collap, setCollap] = useState(false);
   const [loading, setLoading] = useState(false);
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
+  const [question, setQuestion] = useState("");
+  const [options, setOptions] = useState("");
+  const [answer, setAnswer] = useState("");
   const [summary, setSummary] = useState<Article | null>(null);
+  const [quiz, setQuiz] = useState<Quiz | null>(null);
+
   const [history, setHistory] = useState<History[]>([]);
   const [page, setPage] = useState(1);
-
   useEffect(() => {
     if (!userId) return;
     const fetchHistory = async () => {
@@ -71,9 +83,24 @@ export const SideBar = () => {
         console.error("History fetch error:", err);
       }
     };
-
     fetchHistory();
   }, [userId]);
+  // useEffect(() => {
+  //   if (!articleId) return;
+  //   const fetchHistory = async () => {
+  //     try {
+  //       const res = await fetch(`/api/article?articleId=${articleId}`);
+  //       if (!res.ok) throw new Error("Failed to fetch history");
+  //       const data = await res.json();
+  //       console.log(data, "darar");
+
+  //       setHistory(data.articles);
+  //     } catch (err) {
+  //       console.error("History fetch error:", err);
+  //     }
+  //   };
+  //   fetchHistory();
+  // }, [articleId]);
   const handleGenerate = async () => {
     setLoading(true);
     try {
@@ -99,6 +126,41 @@ export const SideBar = () => {
     }
     return setPage(2);
   };
+  const handleTakeQuiz = async () => {
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/generated", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          question: "what was pasta's ingredients?",
+          options: ["goimon", "tomato", "garlic", "potato"],
+          answer: "goimon",
+          articleId: "cmjgsild20003kh5iymdtckha",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Request failed");
+      }
+
+      const data = await response.json();
+      setQuiz(data);
+      console.log(data, "datat");
+
+      console.log(data, "quiz created");
+    } catch (err) {
+      console.error("Generate failed:", err);
+    } finally {
+      setLoading(false);
+    }
+
+    setPage(3);
+  };
+
   // const handleHistorySummary = async () => {
   //   setLoading(true);
   //   try {
@@ -267,11 +329,60 @@ export const SideBar = () => {
                     </DialogContent>
                   </form>
                 </Dialog>
-                <Button className="w-[113px] h-10 border border-gray-200 bg-black rounded-lg flex justify-center items-center text-white text-[14px] cursor-pointer ">
+                <Button
+                  className="w-[113px] h-10 border border-gray-200 bg-black rounded-lg flex justify-center items-center text-white text-[14px] cursor-pointer "
+                  onClick={handleTakeQuiz}
+                >
                   Take a quiz
                 </Button>
               </CardFooter>
             </Card>
+          </div>
+        </div>
+      )}
+      {page === 3 && (
+        <div className="flex-1 bg-white flex justify-center items-start py-14 px-6 w-[1980px] ">
+          <div className="w-[558px] h-72 flex flex-col gap-4 ">
+            <div className="flex justify-between ">
+              <p className="flex items-center gap-3 text-[24px] font-semibold">
+                <StarIcon /> Quick test
+              </p>
+              <button
+                className="h-10 w-12 flex justify-center items-center rounded-lg border border-gray-200"
+                onClick={() => setPage(2)}
+              >
+                x
+              </button>
+            </div>
+            <p className="text-[#71717a] font-medium text-base">
+              Take a quick test about your knowledge from your content{" "}
+            </p>
+            <div className="w-[558px] h-[200px] rounded-lg border border-gray-200 flex items-center">
+              <div className="flex flex-col gap-4 p-5">
+                <div className="flex justify-between ">
+                  <p className="font-medium text-lg">
+                    What was Chingis Khan`s birth name?
+                  </p>
+                  <p className="text-lg">
+                    1 <span className=" text-gray-500">/ 5</span>
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-4">
+                  <button className="w-[243px] h-10 rounded-lg border border-gray-200 flex items-center justify-center cursor-pointer ">
+                    Yesugao
+                  </button>
+                  <button className="w-[243px] h-10 rounded-lg border border-gray-200 flex items-center justify-center cursor-pointer ">
+                    Yesugao
+                  </button>
+                  <button className="w-[243px] h-10 rounded-lg border border-gray-200 flex items-center justify-center cursor-pointer">
+                    Yesugao
+                  </button>
+                  <button className="w-[243px] h-10 rounded-lg border border-gray-200 flex items-center justify-center cursor-pointer">
+                    Yesugao
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -27,16 +27,16 @@ export const QuizTest = () => {
             </p>
           </div>
           <div className="flex flex-wrap gap-4">
-            <button className="w-[243px] h-10 rounded-lg border border-gray-200 flex items-center justify-center ">
+            <button className="w-[243px] h-10 rounded-lg border border-gray-200 flex items-center justify-center cursor-pointer ">
               Yesugao
             </button>
-            <button className="w-[243px] h-10 rounded-lg border border-gray-200 flex items-center justify-center ">
+            <button className="w-[243px] h-10 rounded-lg border border-gray-200 flex items-center justify-center cursor-pointer ">
               Yesugao
             </button>
-            <button className="w-[243px] h-10 rounded-lg border border-gray-200 flex items-center justify-center ">
+            <button className="w-[243px] h-10 rounded-lg border border-gray-200 flex items-center justify-center cursor-pointer">
               Yesugao
             </button>
-            <button className="w-[243px] h-10 rounded-lg border border-gray-200 flex items-center justify-center ">
+            <button className="w-[243px] h-10 rounded-lg border border-gray-200 flex items-center justify-center cursor-pointer">
               Yesugao
             </button>
           </div>
