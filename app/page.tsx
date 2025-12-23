@@ -4,6 +4,7 @@ import { Header } from "./component/header";
 import { SideBar } from "./component/sidebar";
 import { useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
+import { PageOne } from "./component/pageOne";
 
 export default function Home() {
   const { user } = useUser();
@@ -25,9 +26,10 @@ export default function Home() {
   return (
     <div className="w-full ">
       <Header />
-      <SideBar />
-      {/* <QuizTest />
-      <CheckScore /> */}
+      <div className="flex">
+        <SideBar />
+        <PageOne />
+      </div>
     </div>
   );
 }

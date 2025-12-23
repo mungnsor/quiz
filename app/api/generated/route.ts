@@ -1,49 +1,91 @@
-import prisma from "@/lib/prisma";
-// export const POST = async (request: Request) => {
-//   try {
-//     const body = await request.json();
-//     const get = await prisma.article.findMany();
-//     const quiz = await prisma.quiz.create({
-//       data: {
-//         question: body.question,
-//         options: body.options,
-//         answer: body.answer,
-//         articleId: body.articleId,
-//       },
-//     });
-//     return new Response(JSON.stringify({ get, quiz }), {
-//       status: 201,
-//       headers: { "Content-Type": "application/json" },
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     return new Response(JSON.stringify({ message: "Failed to create quiz" }), {
-//       status: 500,
-//       headers: { "Content-Type": "application/json" },
-//     });
-//   }
-// };
+import { GoogleGenAI } from "@google/genai";
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_KEYS!,
+});
 export const POST = async (request: Request) => {
   try {
-    const body = await request.json();
-    const { question, options, answer, articleId } = body;
-    if (!question || !answer || !articleId || !Array.isArray(options)) {
-      return new Response(JSON.stringify({ message: "Invalid request body" }), {
+    const { content, articleId } = await request.json();
+
+    if (!content) {
+      return new Response(JSON.stringify({ message: "Content is required" }), {
         status: 400,
       });
     }
-    const quiz = await prisma.quiz.create({
-      data: {
-        question,
-        options,
-        answer,
-        articleId,
+
+    const result = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              text: `
+You are a JSON API.
+
+Return ONLY raw JSON.
+No markdown.
+No explanations.
+No code fences.
+
+CRITICAL RULES:
+- You MUST return EXACTLY 5 questions.
+- Do NOT return more or fewer.
+- Each question MUST have 4 options (A, B, C, D).
+- Each answer MUST be one of: A, B, C, D.
+
+JSON format:
+{
+  "questions": [
+    {
+      "question": "",
+      "options": {
+        "A": "",
+        "B": "",
+        "C": "",
+        "D": ""
       },
+      "answer": "A"
+    }
+  ]
+}
+
+Article:
+${content}
+`,
+            },
+          ],
+        },
+      ],
     });
-    return new Response(JSON.stringify(quiz), {
-      status: 201,
-      headers: { "Content-Type": "application/json" },
-    });
+
+    const quizText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!quizText) {
+      return new Response(
+        JSON.stringify({ message: "Gemini returned no quiz text" }),
+        { status: 500 }
+      );
+    }
+    let quiz;
+    try {
+      const cleaned = quizText.match(/\{[\s\S]*\}/)?.[0];
+      if (!cleaned) throw new Error("No JSON found");
+      quiz = JSON.parse(cleaned);
+    } catch {
+      return new Response(
+        JSON.stringify({ message: "Invalid JSON returned by Gemini" }),
+        { status: 500 }
+      );
+    }
+    return new Response(
+      JSON.stringify({
+        articleId,
+        quiz,
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   } catch (error: any) {
     console.error("CREATE QUIZ ERROR:", error);
 
