@@ -1,6 +1,7 @@
+import prisma from "@/lib/prisma";
 import { GoogleGenAI } from "@google/genai";
 const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_KEYS!,
+  apiKey: process.env.GEMINI!,
 });
 export const POST = async (request: Request) => {
   try {
@@ -76,10 +77,21 @@ ${content}
         { status: 500 }
       );
     }
+
+    // quiz.questions.map
+
+    const generatedQuiz = await prisma.quiz.create({
+      data: {
+        question: quiz.questions[0].question,
+        answer: quiz.questions[0].answer,
+        options: Object.values(quiz.questions[0].options),
+        articleId,
+      },
+    });
     return new Response(
       JSON.stringify({
         articleId,
-        quiz,
+        quiz: generatedQuiz,
       }),
       {
         status: 200,

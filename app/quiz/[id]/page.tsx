@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useUser } from "@clerk/nextjs";
 import { Header } from "@/app/component/header";
 import { SideBar } from "@/app/component/sidebar";
 import { useParams } from "next/navigation";
@@ -24,6 +23,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import Link from "next/link";
 type Quiz = {
   id: String;
   question: string;
@@ -43,33 +43,34 @@ export default function Home() {
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [page, setPage] = useState(1);
   const [summary, setSummary] = useState<Article | null>(null);
-  const handleTakeQuiz = async () => {
-    setLoading(true);
+  // const handleTakeQuiz = async () => {
+  //   setLoading(true);
 
-    try {
-      const response = await fetch("/api/generated", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          content: summary?.content,
-          articleId: id,
-        }),
-      });
-      if (!response.ok) {
-        throw new Error("Request failed");
-      }
-      const data = await response.json();
-      setQuiz(data);
-      console.log(data, "quiz created");
-    } catch (err) {
-      console.error("Generate failed:", err);
-    } finally {
-      setLoading(false);
-    }
-    return setPage(2);
-  };
+  //   try {
+  //     const response = await fetch("/api/generated", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         content: summary?.content,
+  //         articleId: id,
+  //       }),
+  //     });
+  //     if (!response.ok) {
+  //       throw new Error("Request failed");
+  //     }
+  //     const data = await response.json();
+  //     setQuiz(data);
+  //     console.log(data, "quiz created");
+  //   } catch (err) {
+  //     console.error("Generate failed:", err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  //   return setPage(2);
+  // };
+
   const fetchHistory = async () => {
     try {
       const res = await fetch(`/api/article?userId=${id}`);
@@ -96,9 +97,11 @@ export default function Home() {
         {page === 1 && (
           <div className="flex-1 bg-white flex  items-start py-14 px-6  ">
             <div className="flex flex-col gap-3">
-              <button className="h-10 w-12 bg-white border border-gray-200 flex justify-center items-center rounded-lg cursor-pointer">
-                <LeftIcon />
-              </button>
+              <Link href={"/"}>
+                <button className="h-10 w-12 bg-white border border-gray-200 flex justify-center items-center rounded-lg cursor-pointer">
+                  <LeftIcon />
+                </button>
+              </Link>
               <Card className="w-[856px] min-h-[366px]">
                 <CardHeader>
                   <CardTitle className="flex gap-3 items-center font-semibold text-[24px] ">
@@ -135,11 +138,8 @@ export default function Home() {
                       </DialogContent>
                     </form>
                   </Dialog>
-                  <Button
-                    className="w-[113px] h-10 border border-gray-200 bg-black rounded-lg flex justify-center items-center text-white text-[14px] cursor-pointer "
-                    onClick={handleTakeQuiz}
-                  >
-                    Take a quiz
+                  <Button className="w-[113px] h-10 border border-gray-200 bg-black rounded-lg flex justify-center items-center text-white text-[14px] cursor-pointer ">
+                    {loading ? "Loading" : "Take a quiz"}
                   </Button>
                 </CardFooter>
               </Card>
@@ -163,7 +163,7 @@ export default function Home() {
               <div className="w-[558px] h-[200px] rounded-lg border border-gray-200 flex items-center">
                 <div className="flex flex-col gap-4 p-5">
                   <div className="flex justify-between ">
-                    <p className="font-medium text-lg">{quiz?.question}</p>
+                    <p className="font-medium text-lg"></p>
                     <p className="text-lg">
                       1 <span className=" text-gray-500">/ 5</span>
                     </p>

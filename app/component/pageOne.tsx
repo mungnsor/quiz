@@ -23,71 +23,143 @@ type Article = {
   summary: string;
   userId: string;
 };
-type History = {
-  userId: string;
-  title: string;
-};
 export const PageOne = () => {
   const { user } = useUser();
   const userId = user?.id;
 
   const [content, setContent] = useState("");
   const [collap, setCollap] = useState(false);
-  const [history, setHistory] = useState<History[]>([]);
   const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
   const [summary, setSummary] = useState<Article | null>(null);
+  const [quiz, setQuiz] = useState("");
   const router = useRouter();
-
   const handleQuiz = (id: string) => {
     router.push(`/quiz/${id}`);
   };
-
-  useEffect(() => {
-    if (!userId) return;
-    const fetchHistory = async () => {
-      try {
-        const res = await fetch(`/api/article?userId=${userId}`);
-        if (!res.ok) throw new Error("Failed to fetch history");
-
-        const data = await res.json();
-        console.log(data, "darar");
-
-        setHistory(data.articles);
-      } catch (err) {
-        console.error("History fetch error:", err);
-      }
-    };
-    fetchHistory();
-  }, [userId]);
-  const handleGenerate = async () => {
+  // const handleGenerate = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const response = await fetch("/api/articles", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         title: title,
+  //         content: content,
+  //         userId: userId,
+  //       }),
+  //     });
+  //     if (!response.ok) {
+  //     }
+  //     const data = await response.json();
+  //     setSummary(data.result);
+  //     const id = data.result.id;
+  //     handleQuiz(id);
+  //   } catch (err) {
+  //     console.error("Generate failed:", err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  //   return setPage(2);
+  // };
+  const handleGenQuiz = async () => {
     setLoading(true);
+
     try {
-      const response = await fetch("/api/articles", {
+      const articleRes = await fetch("/api/articles", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          title: title,
-          content: content,
-          userId: userId,
+          title,
+          content,
+          userId,
         }),
       });
-      if (!response.ok) {
+      if (!articleRes.ok) {
+        throw new Error("Article generation failed");
       }
-      const data = await response.json();
-      setSummary(data.result);
-      const id = data.result.id;
+      const articleData = await articleRes.json();
+      setSummary(articleData.result);
+
+      const articleId = articleData.result.id;
+
+      const quizRes = await fetch("/api/generated", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: articleData.result.content,
+          articleId,
+        }),
+      });
+      if (!quizRes.ok) {
+        throw new Error("Quiz generation failed");
+      }
+      const quizData = await quizRes.json();
+      setQuiz(quizData);
+
+      console.log("Quiz created:", quizData);
+      const id = articleData.result.id;
       handleQuiz(id);
     } catch (err) {
-      console.error("Generate failed:", err);
+      console.error("Quiz flow failed:", err);
     } finally {
       setLoading(false);
     }
-    return setPage(2);
   };
+  // const handleGenQuiz = async () => {
+  //   setLoading(true);
+
+  //   try {
+  //     const articleRes = await fetch("/api/articles", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ title, content, userId }),
+  //     });
+
+  //     if (!articleRes.ok) {
+  //       throw new Error("Article generation failed");
+  //     }
+
+  //     const articleData = await articleRes.json();
+  //     const article = articleData?.result;
+
+  //     if (!article?.id || !article?.content) {
+  //       throw new Error("Invalid article response");
+  //     }
+
+  //     setSummary(article);
+
+  //     const quizRes = await fetch("/api/generated", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         content: article.content,
+  //         articleId: article.id,
+  //       }),
+  //     });
+
+  //     if (!quizRes.ok) {
+  //       throw new Error("Quiz generation failed");
+  //     }
+
+  //     const quizData = await quizRes.json();
+  //     setQuiz(quizData);
+
+  //     console.log("Quiz created:", quizData);
+
+  //     handleQuiz(article.id);
+  //   } catch (err) {
+  //     console.error("Quiz flow failed:", err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   return (
     <div className="flex-1 bg-white flex  items-start py-14 px-6 w-[1980px]">
       <Card className={`min-h-[442px] ${collap ? "w-[856px]" : "w-[628px]"}`}>
@@ -127,7 +199,7 @@ export const PageOne = () => {
           </form>
         </CardContent>
         <CardFooter className="flex justify-end">
-          <Button className="w-40 h-10 cursor-pointer" onClick={handleGenerate}>
+          <Button className="w-40 h-10 cursor-pointer" onClick={handleGenQuiz}>
             {loading ? "Loading" : "Generate summary"}
           </Button>
         </CardFooter>

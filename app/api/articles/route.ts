@@ -1,28 +1,20 @@
 import prisma from "@/lib/prisma";
 import { GoogleGenAI } from "@google/genai";
-import { NextResponse } from "next/server";
 const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_KEYS,
+  apiKey: process.env.GEMINI,
 });
 export const POST = async (request: Request) => {
-  const body = await request.json();
-  const { title, content, userId } = body;
-  const user = await prisma.user.findFirst({
-    where: {
-      clerkId: userId,
-    },
-  });
-  const res = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: `this article is article please summarize to me this: ${body.content}`,
-  });
-  const { candidates } = res as any;
-  const summary = candidates[0].content.parts[0].text;
-
   try {
-    if (!userId) {
-      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    }
+    const { title, content, userId } = await request.json();
+    const user = await prisma.user.findFirst({ where: { clerkId: userId } });
+    const res = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: `this article is article please summarize to me this: ${content}`,
+    });
+    console.log(res, "raaaaaararararrararar");
+    const { candidates } = res as any;
+    const summary = candidates[0].content.parts[0].text;
+    console.log(summary, "sad");
     const article = await prisma.article.create({
       data: {
         title: title,
@@ -31,17 +23,31 @@ export const POST = async (request: Request) => {
         summary: summary,
       },
     });
-    return NextResponse.json({ result: article }, { status: 201 });
-  } catch (err) {
-    return NextResponse.json({ error: "aldaa" }, { status: 201 });
+    return new Response(JSON.stringify({ result: article }), {
+      status: 201,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error(error);
+    return new Response(
+      JSON.stringify({ message: "Failed to create article" }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
 };
-export const GET = async (request: Request) => {
+export const GET = async () => {
   try {
     const articles = await prisma.article.findMany();
-    return new Response(JSON.stringify({ articles }), { status: 200 });
-  } catch (err) {
-    console.log(err);
-    return new Response("failed to fetch all articles", { status: 500 });
+
+    return new Response(JSON.stringify({ articles }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error(error);
+    return new Response(
+      JSON.stringify({ message: "Failed to fetch all articles" }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
 };
