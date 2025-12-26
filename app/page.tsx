@@ -23,7 +23,7 @@ export default function Home() {
     }
   }, [user]);
   return (
-    <div className="w-full ">
+    <div className="w-full bg-gray-100 ">
       <Header />
       <div className="flex">
         <SideBar />

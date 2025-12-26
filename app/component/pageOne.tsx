@@ -23,6 +23,12 @@ type Article = {
   summary: string;
   userId: string;
 };
+type QuizQuestion = {
+  id: string;
+  question: string;
+  options: string[];
+  answer: string;
+};
 export const PageOne = () => {
   const { user } = useUser();
   const userId = user?.id;
@@ -32,7 +38,7 @@ export const PageOne = () => {
   const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState<Article | null>(null);
-  const [quiz, setQuiz] = useState("");
+  const [quiz, setQuiz] = useState<QuizQuestion | null>(null);
   const router = useRouter();
   const handleQuiz = (id: string) => {
     router.push(`/quiz/${id}`);
@@ -66,7 +72,6 @@ export const PageOne = () => {
   // };
   const handleGenQuiz = async () => {
     setLoading(true);
-
     try {
       const articleRes = await fetch("/api/articles", {
         method: "POST",
@@ -112,56 +117,8 @@ export const PageOne = () => {
       setLoading(false);
     }
   };
-  // const handleGenQuiz = async () => {
-  //   setLoading(true);
-
-  //   try {
-  //     const articleRes = await fetch("/api/articles", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ title, content, userId }),
-  //     });
-
-  //     if (!articleRes.ok) {
-  //       throw new Error("Article generation failed");
-  //     }
-
-  //     const articleData = await articleRes.json();
-  //     const article = articleData?.result;
-
-  //     if (!article?.id || !article?.content) {
-  //       throw new Error("Invalid article response");
-  //     }
-
-  //     setSummary(article);
-
-  //     const quizRes = await fetch("/api/generated", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({
-  //         content: article.content,
-  //         articleId: article.id,
-  //       }),
-  //     });
-
-  //     if (!quizRes.ok) {
-  //       throw new Error("Quiz generation failed");
-  //     }
-
-  //     const quizData = await quizRes.json();
-  //     setQuiz(quizData);
-
-  //     console.log("Quiz created:", quizData);
-
-  //     handleQuiz(article.id);
-  //   } catch (err) {
-  //     console.error("Quiz flow failed:", err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
   return (
-    <div className="flex-1 bg-white flex  items-start py-14 px-6 w-[1980px]">
+    <div className="flex-1 bg-gray-100 flex  items-start py-14 px-6 w-[1980px] justify-center">
       <Card className={`min-h-[442px] ${collap ? "w-[856px]" : "w-[628px]"}`}>
         <CardHeader>
           <CardTitle className="flex gap-3 items-center">
@@ -200,7 +157,7 @@ export const PageOne = () => {
         </CardContent>
         <CardFooter className="flex justify-end">
           <Button className="w-40 h-10 cursor-pointer" onClick={handleGenQuiz}>
-            {loading ? "Loading" : "Generate summary"}
+            {loading ? "Generating" : "Generate summary "}
           </Button>
         </CardFooter>
       </Card>

@@ -38,13 +38,13 @@ export const SideBar = () => {
     fetchHistory();
   }, [userId]);
   return (
-    <div className="flex w-[800px] min-h-screen">
-      <SidebarProvider className="w-1">
+    <div className="flex min-h-screen">
+      <SidebarProvider>
         <Sidebar
           className={`border-r bg-white relative transition-all duration-300 ${
             collap
               ? "w-[72px] bg-transparent border-none "
-              : "w-[300px] bg-white border-r"
+              : "w-[300px] bg-gray-100 border-r"
           }`}
         >
           <SidebarHeader>

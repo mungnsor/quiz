@@ -77,21 +77,22 @@ ${content}
         { status: 500 }
       );
     }
-
-    // quiz.questions.map
-
-    const generatedQuiz = await prisma.quiz.create({
-      data: {
-        question: quiz.questions[0].question,
-        answer: quiz.questions[0].answer,
-        options: Object.values(quiz.questions[0].options),
-        articleId,
-      },
-    });
+    const createdQuizzes = await prisma.$transaction(
+      quiz.questions.map((q: any) =>
+        prisma.quiz.create({
+          data: {
+            question: q.question,
+            answer: q.answer,
+            options: Object.values(q.options),
+            articleId,
+          },
+        })
+      )
+    );
     return new Response(
       JSON.stringify({
         articleId,
-        quiz: generatedQuiz,
+        quiz: createdQuizzes,
       }),
       {
         status: 200,
@@ -109,4 +110,41 @@ ${content}
       { status: 500 }
     );
   }
+};
+// export const GET = async (
+//   req: Request,
+//   { params }: { params: { articleId: string } }
+// ) => {
+//   try {
+//     const { articleId } = params;
+
+//     const quizzes = await prisma.quiz.findMany({
+//       where: { articleId },
+//       orderBy: { createdAt: "asc" },
+//     });
+
+//     return new Response(JSON.stringify(quizzes), {
+//       status: 200,
+//       headers: { "Content-Type": "application/json" },
+//     });
+//   } catch (err) {
+//     console.error("FETCH QUIZ ERROR:", err);
+//     return new Response(
+//       JSON.stringify({ message: "Failed to fetch quizzes" }),
+//       { status: 500 }
+//     );
+//   }
+// };
+export const GET = async (
+  req: Request,
+  { params }: { params: { articleId: string } }
+) => {
+  const { articleId } = params;
+
+  const quizzes = await prisma.quiz.findMany({
+    where: { articleId },
+    orderBy: { createdAt: "asc" },
+  });
+
+  return Response.json(quizzes);
 };
