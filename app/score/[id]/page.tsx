@@ -35,6 +35,7 @@ export default function Home() {
   const [finished, setFinished] = useState(false);
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const [answered, setAnswered] = useState(false);
   const handleQuiz = () => {
     router.push(`/quiz/${id}`);
   };
@@ -69,18 +70,38 @@ export default function Home() {
     };
     fetchQuiz();
   }, [summary?.id]);
+  // const handleAnswer = (selected: string) => {
+  //   if (selected === quizzes[current].answer) {
+  //     setScore((prev) => prev + 1);
+  //   }
+
+  //   console.log(selected, "selected", quizzes[current].answer, "quizzes");
+  //   setUserAnswers((prev) => [...prev, selected]);
+  //   if (current + 1 === quizzes.length) {
+  //     setFinished(true);
+  //   } else {
+  //     setCurrent((prev) => prev + 1);
+  //   }
+  //   console.log(current, "current", quizzes.length, "hhhh");
+  // };
   const handleAnswer = (selected: string) => {
+    if (answered) return;
+    setAnswered(true);
+
     if (selected === quizzes[current].answer) {
       setScore((prev) => prev + 1);
     }
-    console.log(selected, "selected", quizzes[current].answer, "quizzes");
-
     setUserAnswers((prev) => [...prev, selected]);
-    if (current + 1 === quizzes.length) {
-      setFinished(true);
-    } else {
-      setCurrent((prev) => prev + 1);
-    }
+    console.log(selected, "selected", quizzes[current].answer, "hahaaaa");
+
+    setTimeout(() => {
+      if (current + 1 === quizzes.length) {
+        setFinished(true);
+      } else {
+        setCurrent((prev) => prev + 1);
+        setAnswered(false);
+      }
+    }, 300);
   };
   const saveQuiz = async () => {
     try {
@@ -93,10 +114,6 @@ export default function Home() {
           totalScore: score,
         }),
       });
-      if (!res.ok) {
-        const err = await res.json();
-        console.error(err.message);
-      }
     } catch (err) {
       console.error("Save quiz failed", err);
     }
@@ -104,10 +121,11 @@ export default function Home() {
   return (
     <div className="w-full bg-gray-100">
       <Header />
-      <div className="flex w-[1980px] ">
+      <div className="flex max-w-screen-2xl w-full ">
         <SideBar />
-        {quizzes.length > 0 && current < quizzes.length && (
-          <div className="flex-1 bg-gray-100 flex items-start py-14 px-6 justify-center">
+
+        {!finished && quizzes.length > 0 && (
+          <div className="flex-1 bg-gray-100 flex items-start py-14 px-6 justify-center ">
             <div className="w-[558px] h-72 flex flex-col gap-4">
               <div className="flex justify-between">
                 <p className="flex items-center gap-3 text-[24px] font-semibold">
@@ -165,7 +183,12 @@ export default function Home() {
                     {quizzes[current].options.map((cur, index) => (
                       <button
                         key={index}
-                        className="w-[243px] min-h-10 rounded-lg border border-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-100"
+                        disabled={answered}
+                        className={`w-[243px] min-h-10 rounded-lg border   ${
+                          answered
+                            ? "opacity-50 cursor-not-allowed"
+                            : "hover:bg-gray-100"
+                        }`}
                         onClick={() => handleAnswer(cur)}
                       >
                         {cur}
@@ -178,7 +201,7 @@ export default function Home() {
           </div>
         )}
         {finished && (
-          <div className=" flex-1 bg-gray flex  items-start py-14 px-6 w-[1980px]">
+          <div className=" flex-1 flex items-start py-14 px-6 w-[1980px] justify-center">
             <div className="w-[428px] min-h-[616px] flex flex-col gap-4">
               <p className="flex gap-3 items-center font-bold text-2xl ">
                 <StarIcon /> Quiz completed
@@ -194,13 +217,11 @@ export default function Home() {
                 <div className="flex flex-col gap-2">
                   {quizzes.map((q, index) => {
                     const isCorrect = userAnswers[index] === q.answer;
-
                     return (
-                      <div key={q.id} className="flex gap-3 items-start">
+                      <div key={q.id} className="flex gap-3 items-start  ">
                         {isCorrect ? <RightIcon /> : <WrongIcon />}
-
-                        <div className="text-[#71717a]">
-                          <p>
+                        <div className="text-[#71717a] ">
+                          <p className="">
                             {index + 1}. {q.question}
                           </p>
                           <p className="text-black">

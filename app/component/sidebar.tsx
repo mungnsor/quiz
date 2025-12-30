@@ -44,7 +44,7 @@ export const SideBar = () => {
           className={`border-r bg-white relative transition-all duration-300 ${
             collap
               ? "w-[72px] bg-transparent border-none "
-              : "w-[300px] bg-gray-100 border-r"
+              : "w-[300px] bg-gray-200 border-r"
           }`}
         >
           <SidebarHeader>

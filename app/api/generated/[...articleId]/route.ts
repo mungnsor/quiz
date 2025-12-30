@@ -43,7 +43,7 @@ JSON format:
         "C": "",
         "D": ""
       },
-      "answer": "A"
+      "answer": ""
     }
   ]
 }

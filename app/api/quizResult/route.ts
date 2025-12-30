@@ -1,59 +1,31 @@
 import prisma from "@/lib/prisma";
-
-export const POST = async (req: Request) => {
+import { NextResponse } from "next/server";
+export async function POST(req: Request) {
   try {
     const { userId, quizId, totalScore } = await req.json();
 
     if (!userId || !quizId) {
-      return new Response(
-        JSON.stringify({ message: "Missing userId or quizId" }),
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "Missing data" }, { status: 400 });
     }
-    const existingAttempt = await prisma.quizAttempt.findFirst({
+    const result = await prisma.userScores.upsert({
       where: {
+        userId_quizId: {
+          userId,
+          quizId,
+        },
+      },
+      update: {
+        totalScore,
+      },
+      create: {
         userId,
         quizId,
+        totalScore,
       },
     });
-    if (existingAttempt) {
-      return new Response(
-        JSON.stringify({ message: "Quiz already attempted" }),
-        { status: 409 }
-      );
-    }
-    const result = await prisma.$transaction([
-      prisma.quizAttempt.create({
-        data: {
-          userId,
-          quizId,
-        },
-      }),
-      prisma.userScores.create({
-        data: {
-          userId,
-          quizId,
-          totalScore,
-        },
-      }),
-    ]);
-    return new Response(
-      JSON.stringify({
-        message: "Quiz result saved",
-        attempt: result[0],
-        score: result[1],
-      }),
-      { status: 200 }
-    );
-  } catch (error: any) {
-    console.error("QUIZ RESULT ERROR:", error);
 
-    return new Response(
-      JSON.stringify({
-        message: "Failed to save quiz result",
-        error: error.message,
-      }),
-      { status: 500 }
-    );
+    return NextResponse.json(result);
+  } catch (error: any) {
+    return NextResponse.json({ message: error.message }, { status: 500 });
   }
-};
+}
