@@ -107,40 +107,16 @@ ${content}
     );
   }
 };
-// export const GET = async (
-//   req: Request,
-//   { params }: { params: { articleId: string } }
-// ) => {
-//   try {
-//     const { articleId } = params;
-
-//     const quizzes = await prisma.quiz.findMany({
-//       where: { articleId },
-//       orderBy: { createdAt: "asc" },
-//     });
-
-//     return new Response(JSON.stringify(quizzes), {
-//       status: 200,
-//       headers: { "Content-Type": "application/json" },
-//     });
-//   } catch (err) {
-//     console.error("FETCH QUIZ ERROR:", err);
-//     return new Response(
-//       JSON.stringify({ message: "Failed to fetch quizzes" }),
-//       { status: 500 }
-//     );
-//   }
-// };
-export const GET = async (
+import { NextResponse } from "next/server";
+export async function GET(
   req: Request,
-  { params }: { params: { articleId: string } }
-) => {
-  const { articleId } = params;
-
+  { params }: { params: Promise<{ articleId: string[] }> }
+) {
+  const { articleId } = await params;
+  const id = articleId[0];
   const quizzes = await prisma.quiz.findMany({
-    where: { articleId },
-    orderBy: { createdAt: "asc" },
+    where: { articleId: id },
   });
 
-  return Response.json(quizzes);
-};
+  return NextResponse.json(quizzes);
+}
