@@ -9,7 +9,6 @@ import { SideBar } from "@/app/component/sidebar";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-// import { useSession } from ""
 type Quiz = {
   id: string;
   question: string;
@@ -74,6 +73,8 @@ export default function Home() {
     if (selected === quizzes[current].answer) {
       setScore((prev) => prev + 1);
     }
+    console.log(selected, "selected", quizzes[current].answer, "quizzes");
+
     setUserAnswers((prev) => [...prev, selected]);
     if (current + 1 === quizzes.length) {
       setFinished(true);
@@ -100,9 +101,8 @@ export default function Home() {
       console.error("Save quiz failed", err);
     }
   };
-
   return (
-    <div className="w-full">
+    <div className="w-full bg-gray-100">
       <Header />
       <div className="flex w-[1980px] ">
         <SideBar />

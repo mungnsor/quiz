@@ -25,12 +25,6 @@ import {
 } from "@/components/ui/dialog";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-type Quiz = {
-  id: String;
-  question: string;
-  options: string[];
-  answer: string;
-};
 type Article = {
   id: string;
   title: string;
@@ -70,11 +64,9 @@ export default function Home() {
   //   return setPage(2);
   // };
   const router = useRouter();
-
   const handleQuiz = () => {
     router.push(`/score/${id}`);
   };
-
   const fetchHistory = async () => {
     try {
       const res = await fetch(`/api/article?userId=${id}`);
@@ -102,9 +94,8 @@ export default function Home() {
 
   //   if (id) fetchQuiz();
   // }, [id]);
-
   return (
-    <div className="w-full  ">
+    <div className="w-full bg-gray-100  ">
       <Header />
       <div className="flex ">
         <SideBar />

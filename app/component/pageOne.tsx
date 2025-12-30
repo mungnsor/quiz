@@ -32,7 +32,6 @@ type QuizQuestion = {
 export const PageOne = () => {
   const { user } = useUser();
   const userId = user?.id;
-
   const [content, setContent] = useState("");
   const [collap, setCollap] = useState(false);
   const [title, setTitle] = useState("");
@@ -89,10 +88,8 @@ export const PageOne = () => {
       }
       const articleData = await articleRes.json();
       setSummary(articleData.result);
-
       const articleId = articleData.result.id;
-
-      const quizRes = await fetch("/api/generated", {
+      const quizRes = await fetch(`/api/generated/articleId`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -107,7 +104,6 @@ export const PageOne = () => {
       }
       const quizData = await quizRes.json();
       setQuiz(quizData);
-
       console.log("Quiz created:", quizData);
       const id = articleData.result.id;
       handleQuiz(id);

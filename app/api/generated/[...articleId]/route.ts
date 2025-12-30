@@ -1,18 +1,16 @@
 import prisma from "@/lib/prisma";
 import { GoogleGenAI } from "@google/genai";
 const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI!,
+  apiKey: process.env.KEY!,
 });
 export const POST = async (request: Request) => {
   try {
     const { content, articleId } = await request.json();
-
     if (!content) {
       return new Response(JSON.stringify({ message: "Content is required" }), {
         status: 400,
       });
     }
-
     const result = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: [
@@ -49,7 +47,6 @@ JSON format:
     }
   ]
 }
-
 Article:
 ${content}
 `,
@@ -58,7 +55,6 @@ ${content}
         },
       ],
     });
-
     const quizText = result.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!quizText) {
       return new Response(

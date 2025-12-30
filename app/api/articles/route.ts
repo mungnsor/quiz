@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import { GoogleGenAI } from "@google/genai";
 const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI,
+  apiKey: process.env.KEY,
 });
 export const POST = async (request: Request) => {
   try {
@@ -11,7 +11,6 @@ export const POST = async (request: Request) => {
       model: "gemini-2.5-flash",
       contents: `this article is article please summarize to me this: ${content}`,
     });
-    console.log(res, "raaaaaararararrararar");
     const { candidates } = res as any;
     const summary = candidates[0].content.parts[0].text;
     console.log(summary, "sad");
