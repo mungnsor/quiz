@@ -25,8 +25,6 @@ type Article = {
 export default function Home() {
   const { id } = useParams();
   const articleId = id;
-  //   const { data: session } = useSession();
-  //   const userId = session?.user.id;
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [current, setCurrent] = useState(0);
   const [score, setScore] = useState(0);
@@ -70,39 +68,31 @@ export default function Home() {
     };
     fetchQuiz();
   }, [summary?.id]);
-  // const handleAnswer = (selected: string) => {
-  //   if (selected === quizzes[current].answer) {
-  //     setScore((prev) => prev + 1);
-  //   }
-
-  //   console.log(selected, "selected", quizzes[current].answer, "quizzes");
-  //   setUserAnswers((prev) => [...prev, selected]);
-  //   if (current + 1 === quizzes.length) {
-  //     setFinished(true);
-  //   } else {
-  //     setCurrent((prev) => prev + 1);
-  //   }
-  //   console.log(current, "current", quizzes.length, "hhhh");
-  // };
   const handleAnswer = (selected: string) => {
     if (answered) return;
     setAnswered(true);
-
-    if (selected === quizzes[current].answer) {
+    if (
+      selected.trim().toLowerCase() ===
+      quizzes[current].answer.trim().toLowerCase()
+    ) {
       setScore((prev) => prev + 1);
     }
     setUserAnswers((prev) => [...prev, selected]);
-    console.log(selected, "selected", quizzes[current].answer, "hahaaaa");
-
     setTimeout(() => {
-      if (current + 1 === quizzes.length) {
-        setFinished(true);
-      } else {
-        setCurrent((prev) => prev + 1);
+      setCurrent((prev) => {
+        const next = prev + 1;
+        if (next >= quizzes.length) {
+          setFinished(true);
+          return prev;
+        }
         setAnswered(false);
-      }
+        return next;
+      });
     }, 300);
   };
+  useEffect(() => {
+    console.log("current:", current, "finished:", finished, "score:", score);
+  }, [current, finished, score]);
   const saveQuiz = async () => {
     try {
       const res = await fetch("/api/quizResult", {
@@ -123,7 +113,6 @@ export default function Home() {
       <Header />
       <div className="flex max-w-screen-2xl w-full ">
         <SideBar />
-
         {!finished && quizzes.length > 0 && (
           <div className="flex-1 bg-gray-100 flex items-start py-14 px-6 justify-center ">
             <div className="w-[558px] h-72 flex flex-col gap-4">
@@ -216,16 +205,22 @@ export default function Home() {
                 </p>
                 <div className="flex flex-col gap-2">
                   {quizzes.map((q, index) => {
-                    const isCorrect = userAnswers[index] === q.answer;
+                    const userAnswer = userAnswers[index];
+                    const isCorrect =
+                      userAnswer?.trim().toLowerCase() ===
+                      q.answer.trim().toLowerCase();
+
                     return (
-                      <div key={q.id} className="flex gap-3 items-start  ">
-                        {isCorrect ? <RightIcon /> : <WrongIcon />}
-                        <div className="text-[#71717a] ">
-                          <p className="">
+                      <div key={q.id} className="flex gap-3 items-start">
+                        <div className="w-6 h-6">
+                          {isCorrect ? <RightIcon /> : <WrongIcon />}
+                        </div>
+                        <div className="text-[#71717a]">
+                          <p>
                             {index + 1}. {q.question}
                           </p>
                           <p className="text-black">
-                            Your answer: {userAnswers[index]}
+                            Your answer: {userAnswer ?? "No answer"}
                           </p>
                           {!isCorrect && (
                             <p className="text-green-500">
@@ -237,6 +232,7 @@ export default function Home() {
                     );
                   })}
                 </div>
+
                 <div className="flex gap-4 mt-5">
                   <button
                     className="w-44 h-10 border border-gray-200 flex justify-center items-center rounded-lg gap-2"
@@ -245,6 +241,7 @@ export default function Home() {
                       setScore(0);
                       setUserAnswers([]);
                       setFinished(false);
+                      setAnswered(false);
                     }}
                   >
                     <RefreshIcon /> Restart quiz

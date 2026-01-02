@@ -45,6 +45,7 @@ model QuizAttempt{
    user User @relation(fields: [userId],references: [id])
    quizId String
    quiz Quiz @relation(fields: [quizId],references: [id])
+   score Int
 }
 model UserScores{
    id String @id  @default(cuid())

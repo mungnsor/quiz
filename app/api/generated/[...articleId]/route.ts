@@ -74,17 +74,19 @@ ${content}
       );
     }
     const createdQuizzes = await prisma.$transaction(
-      quiz.questions.map((q: any) =>
-        prisma.quiz.create({
+      quiz.questions.map((q: any) => {
+        const correctAnswerText = q.options[q.answer];
+        return prisma.quiz.create({
           data: {
             question: q.question,
-            answer: q.answer,
             options: Object.values(q.options),
+            answer: correctAnswerText,
             articleId,
           },
-        })
-      )
+        });
+      })
     );
+
     return new Response(
       JSON.stringify({
         articleId,
